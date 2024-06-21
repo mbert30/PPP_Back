@@ -1,51 +1,89 @@
-const express = require('express');
-const router = express.Router();
+module.exports = (app, svc, jwt) => {
 
-router.get("/getPostByID/:id", (req, res) => {
-    res.json({
-        //SELECT Titre, Contenu, Reaction, CreatedAt FROM Post WHERE ID_Post = id
-    });
-});
+    app.get('/piece/getById/:id', jwt.validateJWT, async (req, res) => {
+        if ((req.params.id === undefined)) {
+            return res.status(400).end()
+        }
+        svc.getById(req.params.id)
+        .then(piece => {
+            return res.json({piece})
+        })
+        .catch(e => {
+            console.log(e)
+            return res.status(500).end()
+        })
+    })
 
-router.post("/createPost", (req, res) => {
-    console.log(req.body)
-    res.json({
-        //INSERT INTO Post (Titre, Contenu, ID_User, CreatedAt) VALUES (Titre, Contenu, Reaction, ID_User, NOW());
-    });
-});
+    app.post('/piece/creationPiece', jwt.validateJWT, async (req, res) => {
+        const {refpiece, designation, longueur, largeur, hauteur, typepiece, prix, estvendable, nbstock, id_fournisseur, tabcomposant} = req.body
+        if((refpiece === undefined) || (designation === undefined) || (typepiece === undefined) || (estvendable === undefined)) {
+            return res.status(400).end()
+        }
+        try {
+            if (typepiece === 2) {
+                if (tabcomposant) {
+                    await svc.insertProduit(refpiece, designation, longueur, largeur, hauteur, typepiece, prix, estvendable, nbstock, id_fournisseur, tabcomposant);
+                    return res.status(200).send({});
+                } else {
+                    console.log('Le tableau tabcomposant est vide');
+                    return res.status(400).end();
+                }
+            } else {
+                await svc.insert(refpiece, designation, longueur, largeur, hauteur, typepiece, prix, estvendable, nbstock, id_fournisseur);
+                return res.status(200).send({});
+            }
+        } catch (e) {
+            console.log(e);
+            return res.status(500).end();
+        }
+    })
 
-router.post("/getCommentByPost", (req, res) => {
-    console.log(req.body)
-    res.json({
-        //INSERT INTO Comment (Contenu, ID_User, CreatedAt) VALUES (Contenu, ID_User, NOW());
-    });
-});
+    app.get("/piece/getComposant", jwt.validateJWT, async (req, res) => {
+        svc.getComposant()
+        .then(piece => {
+            return res.json({piece})
+        })
+        .catch(e => {
+            console.log(e)
+            return res.status(500).end()
+        })
+    
+    })
 
+    app.get("/piece/getAll", jwt.validateJWT, async (req, res) => {
+        svc.getAll()
+        .then(piece => {
+            return res.json({piece})
+        })
+        .catch(e => {
+            console.log(e)
+            return res.status(500).end()
+        })
+    
+    })
 
+    app.get('/piece/getPieceComposant/:id', jwt.validateJWT, async (req, res) => {
+        if ((req.params.id === undefined)) {
+            return res.status(400).end()
+        }
+        svc.getPieceComposant(req.params.id)
+        .then(piece => {
+            return res.json({piece})
+        })
+        .catch(e => {
+            console.log(e)
+            return res.status(500).end()
+        })
+    })
 
-
-
-
-
-// router.get("/", (req, res) => {
-//     res.json({message: "Voici les données"});
-// });
-
-// router.post("/", (req, res) => {
-//     console.log(req.body)
-//     res.json({message: req.body.message});
-// });
-
-// router.put("/:id", (req, res) => {
-//     res.json({ messageId: req.params.id });
-// });
-
-// router.delete("/:id", (req, res) => {
-//     res.json({ message: "Poste supprimé id : " + req.params.id });
-// });
-
-// router.patch("/like-post/:id", (req, res) => {
-//     res.json({message: "Voici les données"});
-// });
-
-module.exports = router;
+    app.delete("/piece/delete", jwt.validateJWT, async (req, res) => {
+        const {id} = req.body
+        svc.deleteById(id)
+        .then(res.status(200).send({}))
+        .catch(e => {
+            console.log(e)
+            return res.status(500).end()
+        })
+    
+    })
+}

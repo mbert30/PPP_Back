@@ -2,6 +2,7 @@ module.exports = (app, svc, jwt) => {
 
     app.post('/auth/authenticate', async (req, res) => {
         const {identifiant, mdp} = req.body
+        console.log(req.body)
         if ((identifiant === undefined) || (mdp === undefined)) {
             return res.status(400).end()
         }

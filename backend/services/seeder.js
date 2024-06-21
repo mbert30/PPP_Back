@@ -10,7 +10,7 @@ module.exports = async () => {
 
             await db.query('CREATE TABLE piece (id SERIAL PRIMARY KEY, refpiece VARCHAR(25) NOT NULL, designation VARCHAR(50) NOT NULL, longueur FLOAT, largeur FLOAT, hauteur FLOAT, typepiece SMALLINT NOT NULL, prix FLOAT, estvendable SMALLINT  NOT NULL, nbstock INT, id_fournisseur INT REFERENCES fournisseur);')
 
-            await db.query('CREATE TABLE listepiece (id SERIAL PRIMARY KEY, id_piecePrincipal INT NOT NULL REFERENCES piece, id_composant INT NOT NULL REFERENCES piece);')
+            await db.query('CREATE TABLE listepiece (id SERIAL PRIMARY KEY, id_pieceprincipal INT NOT NULL, id_composant INT NOT NULL, qt INT NOT NULL);')
 
             await db.query('CREATE TABLE operation (id SERIAL PRIMARY KEY, designation VARCHAR(50) NOT NULL, description VARCHAR(100) NOT NULL, machine VARCHAR(50) NOT NULL);')
 

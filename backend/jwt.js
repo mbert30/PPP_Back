@@ -1,6 +1,5 @@
 const jwt = require('jsonwebtoken')
 const jwtKey = process.env.JWTKEY
-const jwtExpirySeconds = 3600
 const db = require("./services/database")
 
 module.exports = (userAccountService) => {
@@ -33,7 +32,6 @@ module.exports = (userAccountService) => {
         generateJWT(login) {
             return jwt.sign({login}, jwtKey, {
                 algorithm: 'HS256',
-                expiresIn: jwtExpirySeconds
             })
         }
     }
